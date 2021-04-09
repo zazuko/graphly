@@ -13,6 +13,7 @@ from graphly.exceptions import NotFoundError
 XML_TYPES_TO_PYTHON_CLS = {
     "http://www.w3.org/2001/XMLSchema#integer": int,
     "http://www.w3.org/2001/XMLSchema#float": float,
+    "http://www.w3.org/2001/XMLSchema#double": float,
     "http://www.w3.org/2001/XMLSchema#decimal": float,
     "http://www.w3.org/2001/XMLSchema#date": date.fromisoformat,
     "http://www.w3.org/2001/XMLSchema#dateTime": (lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")),
@@ -40,11 +41,36 @@ def requests_retry_session(
 
 class SparqlClient:
 
-    BASE_URL = None
-    last_request = 0
-    HEADERS = {
-        'Accept': 'application/sparql-results+json',
-    }
+    def __init__(self, base_url: str = None) -> None:
+        self.BASE_URL = base_url
+        self.last_request = 0
+        self.HEADERS = {
+            'Accept': 'application/sparql-results+json',
+        }
+        self.prefixes = ""
+
+    def __normalize_prefixes(self, prefixes: Dict) -> str:
+        """Transforms dict of prefixes into SPARQL-readable string.
+            Args:
+                prefixes: 		mapping from abbreviations to namespace
+
+            Returns
+                str:            SPARQL-readable prefix mapping. Can be placed at the very beginning of the query.
+
+        """
+        return '\n'.join("PREFIX %s" % ': '.join(map(str, x)) for x in prefixes.items()) + "\n"
+
+    def add_prefixes(self, prefixes: Dict) -> None:
+        """Defines prefixes to be added to every SPARQL query.
+            Args:
+                prefixes: 		mapping from abbreviations to namespace
+
+            Returns
+                None
+        """
+
+        self.prefixes += self.__normalize_prefixes(prefixes)
+
 
     def send_query(self, query: str) -> pd.DataFrame:
         """Send SPARQL query. Transform results to pd.DataFrame.
@@ -56,7 +82,7 @@ class SparqlClient:
         """
 
         session = requests_retry_session()
-        request = {"query": query}
+        request = {"query": self.prefixes + query}
 
         if time.time() < self.last_request + 1:
             time.sleep(1)
