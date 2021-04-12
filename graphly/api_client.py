@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import time
 from datetime import date, datetime
 from typing import Dict
@@ -8,7 +9,10 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-from graphly.exceptions import NotFoundError
+from graphly.exceptions import ExecutionError, NotFoundError
+
+FIND_PATTERN = "PREFIX\s*(.*?)\n"
+SPLIT_PATTERN = ":\s*"
 
 XML_TYPES_TO_PYTHON_CLS = {
     "http://www.w3.org/2001/XMLSchema#integer": int,
@@ -47,29 +51,59 @@ class SparqlClient:
         self.HEADERS = {
             'Accept': 'application/sparql-results+json',
         }
-        self.prefixes = ""
+        self.prefixes = dict()
 
     def __normalize_prefixes(self, prefixes: Dict) -> str:
-        """Transforms dict of prefixes into SPARQL-readable string.
+        """Transfrom prefixes map to SPARQL-readable format
             Args:
-                prefixes: 		mapping from abbreviations to namespace
+                prefixes: 		prefixes to be normalized
 
             Returns
-                str:            SPARQL-readable prefix mapping. Can be placed at the very beginning of the query.
-
+                str             SPARQL-readable prefix definition
         """
+
         return '\n'.join("PREFIX %s" % ': '.join(map(str, x)) for x in prefixes.items()) + "\n"
 
+
     def add_prefixes(self, prefixes: Dict) -> None:
-        """Defines prefixes to be added to every SPARQL query.
+        """Define prefixes to be added to every query
             Args:
-                prefixes: 		mapping from abbreviations to namespace
+                prefixes: 		prefixes to be added to every query
 
             Returns
                 None
         """
 
-        self.prefixes += self.__normalize_prefixes(prefixes)
+        self.prefixes = {**self.prefixes, **prefixes}
+
+
+    def remove_prefixes(self, prefixes: Dict) -> None:
+        """Remove prefixes from the prefixes are added to every query
+            Args:
+                prefixes: 		prefixes to be removed from self.prefixes
+
+            Returns
+                None
+        """
+
+        for prefix in prefixes:
+            self.prefixes.pop(prefix, None)
+
+
+    def __format_query(self, query: str) -> str:
+        """Format SPARQL query to include in-memory prefixes.
+        Prefixes already defined in the query have precedence, and are not overwritten.
+            Args:
+                query: 				user-defined SPARQL query
+
+            Returns
+                str:	            SPARQL query with predefined prefixes
+        """
+
+        prefixes_in_query = dict([re.split(SPLIT_PATTERN, prefix, 1) for prefix in re.findall(FIND_PATTERN, query)])
+        prefixes_to_add = {k: v for (k, v) in self.prefixes.items() if k not in prefixes_in_query}
+
+        return self.__normalize_prefixes(prefixes_to_add) + query
 
 
     def send_query(self, query: str) -> pd.DataFrame:
@@ -82,7 +116,7 @@ class SparqlClient:
         """
 
         session = requests_retry_session()
-        request = {"query": self.prefixes + query}
+        request = {"query": self.__format_query(query)}
 
         if time.time() < self.last_request + 1:
             time.sleep(1)
@@ -94,6 +128,9 @@ class SparqlClient:
 
         if len(response) == 0:
             raise NotFoundError()
+
+        if "head" not in response:
+            raise ExecutionError("{}\n Triplestore error code: {}".format(response["message"], response["code"]))
 
         return self.__normalize_results(response)
 
