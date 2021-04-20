@@ -11,6 +11,7 @@ setup(
         "requests>=2.22.0",
         "pandas>=1.1.3",
         "networkx>=2.5",
-        "matplotlib>=3.3.2"
+        "matplotlib>=3.3.2",
+        "geopandas==0.9.0",
     ]
 )

@@ -2,26 +2,31 @@
 import re
 import time
 from datetime import date, datetime
-from typing import Dict
+from typing import Dict, Union
 
 import pandas as pd
+import geopandas as gpd
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+from shapely import wkt
 
 from graphly.exceptions import ExecutionError, NotFoundError
 
 FIND_PATTERN = "PREFIX\s*(.*?)\n"
 SPLIT_PATTERN = ":\s*"
 
-XML_TYPES_TO_PYTHON_CLS = {
+DATA_TYPES_TO_PYTHON_CLS = {
     "http://www.w3.org/2001/XMLSchema#integer": int,
     "http://www.w3.org/2001/XMLSchema#float": float,
     "http://www.w3.org/2001/XMLSchema#double": float,
     "http://www.w3.org/2001/XMLSchema#decimal": float,
     "http://www.w3.org/2001/XMLSchema#date": date.fromisoformat,
     "http://www.w3.org/2001/XMLSchema#dateTime": (lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")),
+    "http://www.opengis.net/ont/geosparql#wktLiteral": wkt.loads
 }
+
+GEODATA_TYPES = set(["http://www.opengis.net/ont/geosparql#wktLiteral"])
 
 
 def requests_retry_session(
@@ -135,7 +140,7 @@ class SparqlClient:
         return self.__normalize_results(response)
 
 
-    def __normalize_results(self, response: Dict) -> pd.DataFrame:
+    def __normalize_results(self, response: Dict) -> Union[pd.DataFrame, gpd.GeoDataFrame]:
         """Normalize response from SPARQL endpoint. Transform json structure to table. Convert observations to python data types.
             Args:
                 response: 			raw response from SPARQL endpoint
@@ -144,9 +149,11 @@ class SparqlClient:
                 pd.DataFrame	    response from SPARQL endpoint in a tabular form, with python data types
         """
 
+
         cols = response["head"]["vars"]
         data = dict(zip(cols, [[] for i in range(len(cols))]))
 
+        has_geo_data = False
         for row in response["results"]["bindings"]:
             for key in cols:
 
@@ -155,11 +162,18 @@ class SparqlClient:
                     value = row[key]["value"]
                     if 'datatype' in row[key]:
                         datatype = row[key]['datatype']
-                        value = XML_TYPES_TO_PYTHON_CLS[datatype](value)
+                        value = DATA_TYPES_TO_PYTHON_CLS[datatype](value)
+
+                        if datatype in GEODATA_TYPES:
+                            has_geo_data = True
+                            geometry_col = key
+
                 else:
                     value = None
 
                 data[key].append(value)
 
-        df = pd.DataFrame.from_dict(data)
-        return df
+        if has_geo_data:
+            return gpd.GeoDataFrame.from_dict(data).set_geometry(col=geometry_col)
+        else:
+            return pd.DataFrame.from_dict(data)
