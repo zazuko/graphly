@@ -48,6 +48,7 @@ def matplotlib_to_plotly(cmap: matplotlib.colors.Colormap, pl_entries: int) -> L
 
     return pl_colorscale
 
+
 def get_subgraph(graph: nx.Graph, node: str) -> nx.Graph:
     """Get part of the graph containing certain node. All parts of the original graph that
     are not connected to the node are discared.

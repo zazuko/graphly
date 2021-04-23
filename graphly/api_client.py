@@ -4,8 +4,8 @@ import time
 from datetime import date, datetime
 from typing import Dict, Union
 
-import pandas as pd
 import geopandas as gpd
+import pandas as pd
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
@@ -13,8 +13,8 @@ from shapely import wkt
 
 from graphly.exceptions import ExecutionError, NotFoundError
 
-FIND_PATTERN = "PREFIX\s*(.*?)\n"
-SPLIT_PATTERN = ":\s*"
+FIND_PATTERN = "PREFIX\\s*(.*?)\n"
+SPLIT_PATTERN = ":\\s*"
 
 DATA_TYPES_TO_PYTHON_CLS = {
     "http://www.w3.org/2001/XMLSchema#integer": int,
@@ -58,7 +58,7 @@ class SparqlClient:
         }
         self.prefixes = dict()
 
-    def __normalize_prefixes(self, prefixes: Dict) -> str:
+    def _normalize_prefixes(self, prefixes: Dict) -> str:
         """Transfrom prefixes map to SPARQL-readable format
             Args:
                 prefixes: 		prefixes to be normalized
@@ -67,7 +67,10 @@ class SparqlClient:
                 str             SPARQL-readable prefix definition
         """
 
-        return '\n'.join("PREFIX %s" % ': '.join(map(str, x)) for x in prefixes.items()) + "\n"
+        normalized_prefixes = '\n'.join("PREFIX %s" % ': '.join(map(str, x)) for x in prefixes.items())
+        if normalized_prefixes:
+            normalized_prefixes += "\n"
+        return normalized_prefixes
 
 
     def add_prefixes(self, prefixes: Dict) -> None:
@@ -95,7 +98,7 @@ class SparqlClient:
             self.prefixes.pop(prefix, None)
 
 
-    def __format_query(self, query: str) -> str:
+    def _format_query(self, query: str) -> str:
         """Format SPARQL query to include in-memory prefixes.
         Prefixes already defined in the query have precedence, and are not overwritten.
             Args:
@@ -108,7 +111,7 @@ class SparqlClient:
         prefixes_in_query = dict([re.split(SPLIT_PATTERN, prefix, 1) for prefix in re.findall(FIND_PATTERN, query)])
         prefixes_to_add = {k: v for (k, v) in self.prefixes.items() if k not in prefixes_in_query}
 
-        return self.__normalize_prefixes(prefixes_to_add) + query
+        return self._normalize_prefixes(prefixes_to_add) + query
 
 
     def send_query(self, query: str) -> pd.DataFrame:
@@ -121,7 +124,7 @@ class SparqlClient:
         """
 
         session = requests_retry_session()
-        request = {"query": self.__format_query(query)}
+        request = {"query": self._format_query(query)}
 
         if time.time() < self.last_request + 1:
             time.sleep(1)

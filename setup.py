@@ -8,10 +8,10 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        "requests>=2.22.0",
-        "pandas>=1.1.3",
-        "networkx>=2.5",
-        "matplotlib>=3.3.2",
-        "geopandas==0.9.0",
+        "requests>=2.25.1",
+        "networkx>=2.5.1",
+        "matplotlib>=3.4.1",
+        "geopandas>=0.9.0",
+        "pandas>=1.2.4"
     ]
 )
