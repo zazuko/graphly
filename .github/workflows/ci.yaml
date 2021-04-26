@@ -30,6 +30,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Tests on Python ${{ matrix.python-version }}
     - run: |
-      python --version
-      python -m pytest
-      pytest tests/test_api_client.py
+        python --version
+        python -m pytest
+        pytest tests/test_api_client.py
