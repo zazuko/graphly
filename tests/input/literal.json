@@ -1,0 +1,32 @@
+{
+    "head": {
+        "vars": [
+            "capital",
+            "country"
+        ]
+    },
+    "results": {
+        "bindings": [
+            {
+                "country": {
+                    "type": "literal",
+                    "value": "Italy"
+                },
+                "capital": {
+                    "type": "literal",
+                    "value": "Rome"
+                }
+            },
+            {
+                "country": {
+                    "type": "literal",
+                    "value": "Switzerland"
+                },
+                "capital": {
+                    "type": "literal",
+                    "value": "Bern"
+                }
+            }
+        ]
+    }
+}

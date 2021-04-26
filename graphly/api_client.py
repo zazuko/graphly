@@ -22,7 +22,7 @@ DATA_TYPES_TO_PYTHON_CLS = {
     "http://www.w3.org/2001/XMLSchema#double": float,
     "http://www.w3.org/2001/XMLSchema#decimal": float,
     "http://www.w3.org/2001/XMLSchema#date": date.fromisoformat,
-    "http://www.w3.org/2001/XMLSchema#dateTime": (lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")),
+    "http://www.w3.org/2001/XMLSchema#dateTime": (lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S")),
     "http://www.opengis.net/ont/geosparql#wktLiteral": wkt.loads
 }
 
@@ -134,16 +134,16 @@ class SparqlClient:
         response.raise_for_status()
         response = response.json()
 
-        if len(response) == 0:
-            raise NotFoundError()
-
         if "head" not in response:
             raise ExecutionError("{}\n Triplestore error code: {}".format(response["message"], response["code"]))
 
-        return self.__normalize_results(response)
+        if not response["results"]["bindings"]:
+            raise NotFoundError()
+
+        return self._normalize_results(response)
 
 
-    def __normalize_results(self, response: Dict) -> Union[pd.DataFrame, gpd.GeoDataFrame]:
+    def _normalize_results(self, response: Dict) -> Union[pd.DataFrame, gpd.GeoDataFrame]:
         """Normalize response from SPARQL endpoint. Transform json structure to table. Convert observations to python data types.
             Args:
                 response: 			raw response from SPARQL endpoint

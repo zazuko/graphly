@@ -1,0 +1,36 @@
+{
+    "head": {
+        "vars": [
+            "time",
+            "place"
+        ]
+    },
+    "results": {
+        "bindings": [
+            {
+                "time": {
+                    "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                    "type": "literal",
+                    "value": "1408-12-31"
+                },
+                "place": {
+                    "xml:lang": "de",
+                    "type": "literal",
+                    "value": "Kreis 1"
+                }
+            },
+            {
+                "time": {
+                    "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                    "type": "literal",
+                    "value": "1467-12-31"
+                },
+                "place": {
+                    "xml:lang": "de",
+                    "type": "literal",
+                    "value": "Kreis 2"
+                }
+            }
+        ]
+    }
+}

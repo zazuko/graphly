@@ -1,0 +1,36 @@
+{
+    "head": {
+        "vars": [
+            "place",
+            "geometry"
+        ]
+    },
+    "results": {
+        "bindings": [
+            {
+                "geometry": {
+                    "datatype": "http://www.opengis.net/ont/geosparql#wktLiteral",
+                    "type": "literal",
+                    "value": "Point(8.53172 47.36410)"
+                },
+                "place": {
+                    "xml:lang": "de",
+                    "type": "literal",
+                    "value": "Enge"
+                }
+            },
+            {
+                "geometry": {
+                    "datatype": "http://www.opengis.net/ont/geosparql#wktLiteral",
+                    "type": "literal",
+                    "value": "Point(8.56628 47.36464)"
+                },
+                "place": {
+                    "xml:lang": "de",
+                    "type": "literal",
+                    "value": "Hirslanden"
+                }
+            }
+        ]
+    }
+}

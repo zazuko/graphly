@@ -1,0 +1,36 @@
+{
+    "head": {
+        "vars": [
+            "count",
+            "place"
+        ]
+    },
+    "results": {
+        "bindings": [
+            {
+                "count": {
+                    "datatype": "http://www.w3.org/2001/XMLSchema#float",
+                    "type": "literal",
+                    "value": "56.59"
+                },
+                "place": {
+                    "xml:lang": "de",
+                    "type": "literal",
+                    "value": "Kreis 1"
+                }
+            },
+            {
+                "count": {
+                    "datatype": "http://www.w3.org/2001/XMLSchema#float",
+                    "type": "literal",
+                    "value": "47.12"
+                },
+                "place": {
+                    "xml:lang": "de",
+                    "type": "literal",
+                    "value": "Kreis 2"
+                }
+            }
+        ]
+    }
+}
