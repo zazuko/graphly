@@ -23,7 +23,6 @@ jobs:
         source venv/bin/activate
         which pip
         easy_install --version
-        pip install setuptools
         pip install -e .
     - name: Unit tests
       run: |

@@ -11,6 +11,7 @@ requests = "^2.25.1"
 networkx = "^2.5.1"
 matplotlib = "^3.4.1"
 pandas = "^1.2.4"
+setuptools = "^56.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"

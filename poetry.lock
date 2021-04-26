@@ -399,7 +399,7 @@ brotli = ["brotlipy (>=0.6.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "e4d65c5c27bd651eca276bef464519a776ad437a670636e1beaa1bd420a80da1"
+content-hash = "f70d02cb19dd5fbd237b09639116d27f3ddf63251d6876746cf5248921cfe8cb"
 
 [metadata.files]
 atomicwrites = [
