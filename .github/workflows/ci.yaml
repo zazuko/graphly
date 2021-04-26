@@ -23,6 +23,7 @@ jobs:
         source venv/bin/activate
         which pip
         pip install -e .[dev]
+                pip freeze
     - name: Unit tests
       run: |
         echo "Unit testing"
