@@ -13,5 +13,11 @@ setup(
         "matplotlib>=3.4.1",
         "geopandas>=0.9.0",
         "pandas>=1.2.4"
-    ]
+    ],
+    extras_require={
+        'dev': [
+            'pytest',
+            'pytest-cov'
+        ]
+    }
 )
