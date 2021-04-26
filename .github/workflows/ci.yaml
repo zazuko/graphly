@@ -26,4 +26,5 @@ jobs:
     - name: Unit tests
       run: |
         echo "Unit testing"
+        pip freeze
         python -m pytest
