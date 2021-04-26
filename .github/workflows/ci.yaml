@@ -25,6 +25,4 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
-        pytest tests/test_api_client.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-        #echo "Unit testing"
-        #pip freeze
+        pytest tests/test_api_client.py
