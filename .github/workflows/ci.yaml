@@ -22,6 +22,7 @@ jobs:
         python -m venv venv
         source venv/bin/activate
         pip install -e .[dev]
+
   test:
     runs-on: ubuntu-20.04
     needs: build
@@ -30,6 +31,5 @@ jobs:
     - name: Tests on Python ${{ matrix.python-version }}
     - run: |
       python --version
-      pip freeze
       python -m pytest
       pytest tests/test_api_client.py
