@@ -22,10 +22,9 @@ jobs:
         python -m venv venv
         source venv/bin/activate
         pip install -e .[dev]
-  test:
-    runs-on: ubuntu-20.04
-    needs: build
-    - name: Unit tests
+    - name: Test with pytest
       run: |
-        echo "Unit testing"
-        pip freeze
+        pip install pytest
+        pytest tests/test_api_client.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+        #echo "Unit testing"
+        #pip freeze
