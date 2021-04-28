@@ -11,23 +11,21 @@ jobs:
         python-version: [3.8, 3.9]
 
     steps:
-    - name: Install dependencies for ${{ matrix.python-version }}
+    - name: Checkout the code
+      uses: actions/checkout@v2
+
+    - name: Setyp Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Setup venv
       run: |
-        python -m pip install --upgrade pip
         python -m venv venv
         source venv/bin/activate
-        pip install -e .[dev]
 
-  test:
-    runs-on: ubuntu-20.04
-    needs: build
-    steps:
-    - name: Tests on Python ${{ matrix.python-version }}
-      uses: actions/checkout@v2
-      run: |
-        python --version
-        python -m pytest
-        pytest tests/test_api_client.py
+    - name: Install dependencies
+      run: pip install -e .[dev]
+
+    - name: Run tests
+      run: python -m pytest
