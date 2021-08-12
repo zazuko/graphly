@@ -51,13 +51,14 @@ def requests_retry_session(
 
 class SparqlClient:
 
-    def __init__(self, base_url: str = None) -> None:
+    def __init__(self, base_url: str = None, timeout: int = 15) -> None:
         self.BASE_URL = base_url
         self.last_request = 0
         self.HEADERS = {
             'Accept': 'application/sparql-results+json',
         }
         self.prefixes = dict()
+        self.timeout = timeout
 
     def _normalize_prefixes(self, prefixes: Dict) -> str:
         """Transfrom prefixes map to SPARQL-readable format
@@ -131,7 +132,7 @@ class SparqlClient:
             time.sleep(1)
         self.last_request = time.time()
 
-        response = session.get(self.BASE_URL, headers=self.HEADERS, params=request)
+        response = session.get(self.BASE_URL, headers=self.HEADERS, params=request, timeout=self.timeout)
         response.raise_for_status()
         response = response.json()
 
