@@ -131,7 +131,7 @@ class SparqlClient:
         """Send SPARQL query. Transform results to pd.DataFrame.
         Args:
             query: 				full SPARQL query
-            timeout:
+            timeout:            timeout (in seconds) for this query. If not defined, the self.timeout will be used.
 
         Returns
             pd.DataFrame	    query results
