@@ -147,7 +147,7 @@ class SparqlClient:
         if timeout == 0:
             timeout = self.timeout
 
-        if timeout is None:
+        if timeout is not None:
             response = session.get(
                 self.BASE_URL, headers=self.HEADERS, params=request, timeout=timeout
             )
