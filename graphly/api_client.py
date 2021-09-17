@@ -57,7 +57,12 @@ def requests_retry_session(
 
 
 class SparqlClient:
-    def __init__(self, base_url: str = None, timeout: Optional[int] = 15) -> None:
+    def __init__(
+        self,
+        base_url: str = None,
+        timeout: Optional[int] = 15,
+        output: Optional[str] = "pandas",
+    ) -> None:
         self.BASE_URL = base_url
         self.last_request = 0
         self.HEADERS = {
@@ -65,6 +70,7 @@ class SparqlClient:
         }
         self.prefixes = dict()
         self.timeout = timeout
+        self.output = output
 
     def _normalize_prefixes(self, prefixes: Dict) -> str:
         """Transfrom prefixes map to SPARQL-readable format
@@ -166,7 +172,14 @@ class SparqlClient:
         if not response["results"]["bindings"]:
             raise NotFoundError()
 
-        return self._normalize_results(response)
+        if self.output == "pandas":
+            return self._normalize_results(response)
+        elif self.output == "dict":
+            return response
+        else:
+            raise TypeError(
+                "Invalid output type. Choose `pandas` or `dict` as output type"
+            )
 
     def _normalize_results(
         self, response: Dict
