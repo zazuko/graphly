@@ -62,7 +62,10 @@ class SparqlClient:
         base_url: str = None,
         timeout: Optional[int] = 15,
         output: Optional[str] = "pandas",
+        user: Optional[str] = None,
+        password: Optional[str] = None,
     ) -> None:
+
         self.BASE_URL = base_url
         self.last_request = 0
         self.HEADERS = {
@@ -71,6 +74,10 @@ class SparqlClient:
         self.prefixes = dict()
         self.timeout = timeout
         self.output = output
+
+        self.session = requests_retry_session()
+        if user and password:
+            self.session.auth = (user, password)
 
     def _normalize_prefixes(self, prefixes: Dict) -> str:
         """Transfrom prefixes map to SPARQL-readable format
@@ -143,7 +150,6 @@ class SparqlClient:
             pd.DataFrame	    query results
         """
 
-        session = requests_retry_session()
         request = {"query": self._format_query(query)}
 
         if time.time() < self.last_request + 1:
@@ -154,11 +160,13 @@ class SparqlClient:
             timeout = self.timeout
 
         if timeout is not None:
-            response = session.get(
+            response = self.session.get(
                 self.BASE_URL, headers=self.HEADERS, params=request, timeout=timeout
             )
         else:
-            response = session.get(self.BASE_URL, headers=self.HEADERS, params=request)
+            response = self.session.get(
+                self.BASE_URL, headers=self.HEADERS, params=request
+            )
         response.raise_for_status()
         response = response.json()
 
