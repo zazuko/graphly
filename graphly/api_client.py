@@ -23,7 +23,7 @@ DATA_TYPES_TO_PYTHON_CLS = {
     "http://www.w3.org/2001/XMLSchema#decimal": float,
     "http://www.w3.org/2001/XMLSchema#date": date.fromisoformat,
     "http://www.w3.org/2001/XMLSchema#dateTime": (
-        lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%S")
+        lambda x: datetime.strptime(x.rstrip("Z"), "%Y-%m-%dT%H:%M:%S")
     ),
     "http://www.opengis.net/ont/geosparql#wktLiteral": wkt.loads,
     "http://www.openlinksw.com/schemas/virtrdf#Geometry": wkt.loads,
