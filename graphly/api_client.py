@@ -27,12 +27,24 @@ DATA_TYPES_TO_PYTHON_CLS = {
     ),
     "http://www.opengis.net/ont/geosparql#wktLiteral": wkt.loads,
     "http://www.openlinksw.com/schemas/virtrdf#Geometry": wkt.loads,
+    "https://www.w3.org/2001/XMLSchema#integer": int,
+    "https://www.w3.org/2001/XMLSchema#float": float,
+    "https://www.w3.org/2001/XMLSchema#double": float,
+    "https://www.w3.org/2001/XMLSchema#decimal": float,
+    "https://www.w3.org/2001/XMLSchema#date": date.fromisoformat,
+    "https://www.w3.org/2001/XMLSchema#dateTime": (
+        lambda x: datetime.strptime(x.rstrip("Z"), "%Y-%m-%dT%H:%M:%S")
+    ),
+    "https://www.opengis.net/ont/geosparql#wktLiteral": wkt.loads,
+    "https://www.openlinksw.com/schemas/virtrdf#Geometry": wkt.loads,
 }
 
 GEODATA_TYPES = set(
     [
         "http://www.opengis.net/ont/geosparql#wktLiteral",
         "http://www.openlinksw.com/schemas/virtrdf#Geometry",
+        "https://www.opengis.net/ont/geosparql#wktLiteral",
+        "https://www.openlinksw.com/schemas/virtrdf#Geometry",
     ]
 )
 
