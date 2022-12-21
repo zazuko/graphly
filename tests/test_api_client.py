@@ -6,9 +6,11 @@ import os
 import geopandas as gpd
 import pandas as pd
 import pytest
-from graphly.api_client import SparqlClient
-from graphly import exceptions
+from requests.exceptions import HTTPError
 from shapely import wkt
+
+from graphly import exceptions
+from graphly.api_client import SparqlClient
 
 FILES_PATH = ["tests", "input"]
 
@@ -241,13 +243,13 @@ class Test_SparqlClient(object):
         with pytest.raises(exceptions.NotFoundError):
             self.client.send_query(query)
 
-    def test_send_query_triplestore_error(self):
+    def test_send_query_http_error(self):
 
         query = """
         SELECT *
         """
 
-        with pytest.raises(exceptions.ExecutionError):
+        with pytest.raises(HTTPError):
             self.client.send_query(query)
 
     def test_send_query_valid_query(self):
